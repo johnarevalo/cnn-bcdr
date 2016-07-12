@@ -1,0 +1,129 @@
+###path params###
+models_path: 'models/'
+#used for filename
+model_name: 'random'
+save_freq: 10
+
+#ds_dir: 'BCDR-F01'
+#csv_file: 'bcdr_f01_outlines.csv'
+#csv_features_file: 'bcdr_f01_features.csv'
+#csv_point_separator: ' '
+csv_class_column: 'classification'
+ds_dir: 'BCDR-F03'
+csv_file: 'bcdr_f03_outlines.csv'
+csv_features_file: 'bcdr_f03_features.csv'
+csv_point_separator: ' '
+csv_positive_class: 'Malign'
+###Split dataset params###
+
+# Dataset name. Used for filename
+ds_name: 'miwad01-random'
+# CraneoCaudal images with nodules only. Check bcdr_f01_outlines.csv for
+# more info
+filters: {
+#   image_view: ['1', '2'],
+   mammography_nodule: ['1']
+}
+img_width: 720
+img_height: 1167
+
+train_on_memory: True
+valid_on_memory: True
+valid_percent: 0.1
+test_percent: 0.4
+rng_seed: [2014, 10, 29]
+
+###Region sampling params##
+region_size: 150
+region_stride: 30
+min_overlap: 0.64
+oversampling: True
+apply_mask: False
+crop_image: True
+scale_image: True
+convex_hull: True
+num_channels: 1
+
+###Preprocessing params###
+preprocessing: {
+    per_roi: False,
+    lcn: True,
+    gcn: True,
+    remove_mean: False,
+    batch_size: 5000
+}
+###Patch (filter) params###
+patch_size: 11
+npatches_train: 400000
+npatches_valid: 150000
+
+###sae params###
+sae: {
+    nhid: 64,
+    beta: 5,
+    rho: 0.035,
+    lmbda: 0.0035,
+    init: 'irange: 0.005'
+}
+pool_fn: 'max'
+
+### conv params###
+cnn_layers: 3
+load_pretrained: False
+
+h0: {
+    nhid: 64,
+    init: 'irange: 0.0069585550803',
+    bias: 0,
+    drop_prob: 0.8,
+    drop_scale: 1.,
+    col_norm: 1.9845590751341953,
+    kernel_shape: 11,
+    pool_shape: 5,
+    pool_stride: 4,
+    pool_type: 'max'
+}
+
+h1: {
+    nhid: 64,
+    init: 'irange: 0.01',
+    bias: 0,
+    col_norm: 0.12,
+    kernel_shape: 4,
+    pool_shape: 4,
+    pool_stride: 4,
+    pool_type: 'max'
+}
+
+hfc: {
+    nhid: 400,
+    init: 'sparse_init: 30',
+    bias: 0,
+    col_norm: 4.390266941491841,
+    num_pieces: 2
+}
+
+y: {
+    init: 'sparse_init: 20',
+    col_norm: 2.6839111498943513,
+}
+
+regre: {
+    init: 'irange: 0.005',
+    min_beta: 1.,
+    max_beta: 100.,
+    beta_lr_scale: 1.,
+}
+alpha_layers: '[0.9, 0.1]'
+
+## SGD Params ##
+learning_rate: 0.02
+lr_sat: 80
+lr_decay: 0.04
+init_momentum: 0.5
+final_momentum: 0.99
+msat: 64
+max_epochs: 100
+batch_size: 32
+### evaluate on whole image escenario ###
+stride: 30

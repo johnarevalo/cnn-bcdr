@@ -1,0 +1,94 @@
+!obj:pylearn2.train.Train {
+    dataset: &train !obj:datasets.%(train_ds_class)s {
+        which_set: 'train'
+    },
+    model: !obj:pylearn2.models.mlp.MLP {
+        batch_size: %(batch_size)i,
+        input_space: !obj:pylearn2.space.Conv2DSpace {
+            shape: [%(region_size)i, %(region_size)i],
+            num_channels: %(num_channels)i
+        },
+        layers: [ !obj:pylearn2.models.mlp.ConvElemwise {
+                    layer_name: 'h0',
+                    output_channels: %(h0_nhid)i,
+                    %(h0_init)s,
+                    init_bias: %(h0_bias)f,
+                    kernel_shape: [%(h0_kernel_shape)i, %(h0_kernel_shape)i],
+                    pool_shape: [%(h0_pool_shape)i, %(h0_pool_shape)i],
+                    pool_stride: [%(h0_pool_stride)i, %(h0_pool_stride)i],
+                    pool_type: %(h0_pool_type)s,
+                    max_kernel_norm: %(h0_col_norm)f,
+                    nonlinearity: !obj:pylearn2.models.mlp.RectifierConvNonlinearity {}
+                }, !obj:pylearn2.models.mlp.ConvElemwise {
+                    layer_name: 'h1',
+                    output_channels: %(h1_nhid)i,
+                    %(h1_init)s,
+                    init_bias: %(h1_bias)f,
+                    kernel_shape: [%(h1_kernel_shape)i, %(h1_kernel_shape)i],
+                    pool_shape: [%(h1_pool_shape)i, %(h1_pool_shape)i],
+                    pool_stride: [%(h1_pool_stride)i, %(h1_pool_stride)i],
+                    pool_type: %(h1_pool_type)s,
+                    max_kernel_norm: %(h1_col_norm)f,
+                    nonlinearity: !obj:pylearn2.models.mlp.RectifierConvNonlinearity {}
+                }, !obj:pylearn2.models.maxout.Maxout {
+                    layer_name: 'hfc',
+                    num_units: %(hfc_nhid)i,
+                    num_pieces: %(hfc_num_pieces)i,
+                    %(hfc_init)s,
+                    init_bias: %(hfc_bias)f,
+                    max_col_norm: %(hfc_col_norm)f,
+                }, !obj:pylearn2.models.mlp.Softmax {
+                    %(y_init)s,
+                    max_col_norm: %(y_col_norm)f,
+                    layer_name: 'y',
+                    n_classes: 2,
+                }
+            ],
+    },
+    algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
+        train_iteration_mode: 'even_batchwise_shuffled_sequential',
+        monitor_iteration_mode: 'even_sequential',
+        monitoring_batch_size: %(monitoring_batch_size)i,
+        batch_size: %(batch_size)i,
+        learning_rate: %(learning_rate)f,
+        learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+            init_momentum: %(init_momentum)f,
+        },
+        monitoring_dataset: {
+            'train' : *train,
+            'valid' : !obj:datasets.%(valid_ds_class)s {
+                which_set: 'valid'
+            }
+        },
+        cost: !obj:pylearn2.costs.mlp.dropout.Dropout {
+            input_include_probs: { 'h0' : %(h0_drop_prob)f },
+            input_scales: { 'h0' : %(h0_drop_scale)f }
+        },
+        termination_criterion: !obj:pylearn2.termination_criteria.And {
+            criteria: [
+                !obj:pylearn2.termination_criteria.EpochCounter {
+                    max_epochs: %(max_epochs)i
+                },
+            ]
+        },
+    },
+    extensions:
+        [ !obj:pylearn2.train_extensions.best_params.MonitorBasedSaveBest {
+             channel_name: 'valid_roc_auc',
+             save_path: %(best_path)s,
+             higher_is_better: True
+        }, !obj:pylearn2.training_algorithms.learning_rule.MomentumAdjustor {
+            start: 1,
+            saturate: %(msat)d,
+            final_momentum: %(final_momentum)f
+        }, !obj:pylearn2.training_algorithms.sgd.LinearDecayOverEpoch {
+            start: 1,
+            saturate: %(lr_sat)d,
+            decay_factor: %(lr_decay)f
+        },
+        !obj:pylearn2.train_extensions.roc_auc.RocAucChannel {}
+    ],
+    save_path: %(save_path)s,
+    save_freq: %(save_freq)i,
+}
+
