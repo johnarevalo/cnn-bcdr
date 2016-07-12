@@ -7,7 +7,7 @@ Source code for [Representation learning for mammography mass lesion classificat
 This code is written in python. To use it you will need:
 
 * Python 2.7
-* Pylearn2 (tested on lisa-lab/pylearn2@30437ee5621eddcfb3ee7ef2fdb12d3591367a85)
+* Pylearn2 (tested on [pylearn2@30437ee](https://github.com/lisa-lab/pylearn2/tree/30437ee))
 * Scipy
 * [Shapely] (https://github.com/Toblerity/Shapely)
 
