@@ -15,7 +15,7 @@ This code is written in python. To use it you will need:
 
 ### Data
 
-With this paper we released the Breast Cancer Digital Repository F03 (BCDR-F03) dataset. You can get a copy from http://bcdr.inegi.up.pt/. Uncompress it under the `data`folder.
+With this paper we released the Breast Cancer Digital Repository F03 (BCDR-F03) dataset. You can get a copy from http://bcdr.inegi.up.pt/. Uncompress it under the `data` folder.
 
 ### Preprocessing
   * Create hdf5 dataset:
