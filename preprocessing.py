@@ -16,7 +16,7 @@ if __name__ == "__main__":
         paths['raw_train'], paths['train'], title=conf['ds_name'])
 
     axes = ('b', 0, 1, 'c')
-    channels = node.X.shape[1] / (region_size * region_size)
+    channels = int(node.X.shape[1] / (region_size * region_size))
     view_converter = dense_design_matrix.DefaultViewConverter(
         (region_size, region_size, channels), axes)
     train = dense_design_matrix.DenseDesignMatrixPyTables(

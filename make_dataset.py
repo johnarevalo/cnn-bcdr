@@ -19,15 +19,15 @@ if __name__ == "__main__":
     nsamples = {}
 
     prefixes = ['s_', 'i_', 't_']  # Feature names' prefixes
-    for subset, subrows in rowsdict.iteritems():
+    for subset, subrows in rowsdict.items():
         X = None
         y = []
         feats = []
         for row in subrows:
             samples = utils.get_samples_from_image(
                 row, oversampling=(subset == 'train' and conf['oversampling']))
-            print "%i samples to %s taken from %s" % (
-                len(samples), subset, row['image_filename'])
+            print("%i samples to %s taken from %s" % (
+                len(samples), subset, row['image_filename']))
             if len(samples) == 0:
                 continue
             samples = np.array(samples, dtype=np.float32) / 255.0
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             X[-len(samples):] = samples
             y.extend([utils.is_positive(row) for i in range(len(samples))])
             feats.extend(
-                [[float(v) for k, v in row.iteritems() if len(filter(k.startswith, prefixes)) > 0]] * samples.shape[0])
+                [[float(v) for k, v in row.items() if len(list(filter(k.startswith, prefixes))) > 0]] * samples.shape[0])
 
         y = np.asarray(y)
         y = np.vstack((y, 1 - y)).T

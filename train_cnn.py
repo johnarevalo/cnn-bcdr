@@ -35,10 +35,10 @@ def main():
     })
     train = yaml_parse.load(src % params)
     if os.path.isfile(train.save_path):
-        print '%s already exists, skipping...' % (train.save_path)
+        print('%s already exists, skipping...' % (train.save_path))
     else:
         if conf['load_pretrained']:
-            print 'Setting pretrained filters...'
+            print('Setting pretrained filters...')
             ae = serial.load(paths['sae']['model'])
 
             W = ae.get_weights().T.reshape(
@@ -46,7 +46,7 @@ def main():
             train.model.layers[0].transformer._filters.set_value(W)
 
         train.main_loop()
-    print 'Done!'
+    print('Done!')
 
 if __name__ == '__main__':
     main()

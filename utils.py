@@ -191,11 +191,11 @@ def split_patients(patients, valid_percent, test_percent, rng=(2014, 10, 22)):
     if isinstance(rng, (list, tuple)):
         rng = make_np_rng(None, rng, which_method='uniform')
 
-    vals = np.asarray(patients.values())
-    keys = np.asarray(patients.keys())
-    sss = StratifiedShuffleSplit(
-        vals, n_iter=1, test_size=test_percent, random_state=rng)
-    remaining_idx, test_idx = sss.__iter__().next()
+    vals = np.asarray(list(patients.values()))
+    keys = np.asarray(list(patients.keys()))
+    sss = StratifiedShuffleSplit(vals, n_iter=1, test_size=test_percent,
+                                 random_state=rng)
+    remaining_idx, test_idx = next(sss.__iter__())
 
     if valid_percent > 0:
         # Rate of samples required to build validation set
@@ -203,7 +203,7 @@ def split_patients(patients, valid_percent, test_percent, rng=(2014, 10, 22)):
 
         sss = StratifiedShuffleSplit(
             vals[remaining_idx], n_iter=1, test_size=valid_rate, random_state=rng)
-        tr_idx, val_idx = sss.__iter__().next()
+        tr_idx, val_idx = next(sss.__iter__())
         valid_idx = remaining_idx[val_idx]
         train_idx = remaining_idx[tr_idx]
     else:
@@ -228,7 +228,7 @@ def split_dataset(rows, valid_percent, test_percent, rng=(2014, 10, 22), patient
 
 
 def check_filter(row, filter):
-    for key, value in filter.iteritems():
+    for key, value in filter.items():
         if str(row[key]) not in value:
             return False
     return True
@@ -482,7 +482,7 @@ def get_points(row):
     conf = get_config()
     x = map(int, row['lw_x_points'].split(conf['csv_point_separator']))
     y = map(int, row['lw_y_points'].split(conf['csv_point_separator']))
-    return (x, y)
+    return (list(x), list(y))
 
 
 def is_positive(row):

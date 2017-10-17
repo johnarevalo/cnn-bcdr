@@ -16,7 +16,7 @@ class BCDR(dense_design_matrix.DenseDesignMatrixPyTables):
         self.h5file = tables.open_file(paths[which_set])
         node = self.h5file.root.Data
         axes = ('b', 0, 1, 'c')
-        channels = node.X.shape[1] / (region_size * region_size)
+        channels = int(node.X.shape[1] / (region_size * region_size))
         view_converter = dense_design_matrix.DefaultViewConverter(
             (region_size, region_size, channels), axes)
         super(BCDR, self).__init__(
@@ -32,7 +32,7 @@ class BCDR_On_Memory(dense_design_matrix.DenseDesignMatrix):
         h5file = tables.open_file(paths[which_set])
         node = h5file.root.Data
         X = node.X.read()
-        channels = node.X.shape[1] / (region_size * region_size)
+        channels = int(node.X.shape[1] / (region_size * region_size))
         X = X.reshape(
             (X.shape[0], conf['region_size'], conf['region_size'], channels))
         y = node.y.read()
