@@ -23,6 +23,7 @@ if __name__ == "__main__":
         X = None
         y = []
         feats = []
+        segm_ids = []
         for row in subrows:
             samples = utils.get_samples_from_image(
                 row, oversampling=(subset == 'train' and conf['oversampling']))
@@ -42,12 +43,15 @@ if __name__ == "__main__":
             X.resize(X.shape[0] + samples.shape[0], axis=0)
             X[-len(samples):] = samples
             y.extend([utils.is_positive(row) for i in range(len(samples))])
+            segm_ids.extend([int(row['segmentation_id']) for i in range(len(samples))])
             feats.extend(
                 [[float(v) for k, v in row.items() if len(list(filter(k.startswith, prefixes))) > 0]] * samples.shape[0])
 
         y = np.asarray(y)
         y = np.vstack((y, 1 - y)).T
         f.create_dataset('y', data=y)
+        segm_ids = np.asarray(segm_ids)
+        f.create_dataset('segm_ids', data=segm_ids)
         f.create_dataset('feats', data=np.asarray(feats))
         nsamples[subset] = X.shape[0]
         f.close()

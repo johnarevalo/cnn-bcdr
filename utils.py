@@ -418,7 +418,7 @@ def init_hdf5(path, shapes, title="Pylearn2 Dataset", filters=None):
     from theano import config
     if filters is None:
         filters = tables.Filters(complib='blosc', complevel=5)
-    x_shape, y_shape, feats_shape = shapes
+    x_shape, y_shape, feats_shape, segm_ids = shapes
     h5file = tables.open_file(path, mode="w", title=title)
     node = h5file.create_group(h5file.root, "Data", "Data")
     atom = (tables.Float32Atom() if config.floatX == 'float32'
@@ -429,12 +429,14 @@ def init_hdf5(path, shapes, title="Pylearn2 Dataset", filters=None):
                          title="Data targets", filters=filters)
     h5file.create_carray(node, 'feats', atom=atom, shape=feats_shape,
                          title="Data targets", filters=filters)
+    h5file.create_carray(node, 'segm_ids', atom=tables.Int32Atom(), shape=segm_ids,
+                         title="Data targets", filters=filters)
     return h5file, node
 
 
 def h5py_to_tables(inputfile, outputfile, title='exported_pytables'):
     hf = tables.open_file(inputfile)
-    shapes = (hf.root.X.shape, hf.root.y.shape, hf.root.feats.shape)
+    shapes = (hf.root.X.shape, hf.root.y.shape, hf.root.feats.shape, hf.root.segm_ids.shape)
     h5file, node = init_hdf5(outputfile, shapes, title)
     for i, x in enumerate(hf.root.X):
         node.X[i] = x
@@ -444,6 +446,9 @@ def h5py_to_tables(inputfile, outputfile, title='exported_pytables'):
 
     for i, feats in enumerate(hf.root.feats):
         node.feats[i] = feats
+
+    for i, segm_id in enumerate(hf.root.segm_ids):
+        node.segm_ids[i] = segm_id
     hf.close()
     return h5file, node
 
